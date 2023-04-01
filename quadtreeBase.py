@@ -8,7 +8,7 @@ class QuadTreeNode:
         self.app = app
 
         self.parent = parent
-        self.subTree = []
+        self.subNodes = []
         self.x = x
         self.y = y
         self.w = w
@@ -27,7 +27,7 @@ class QuadTreeNode:
             return True
 
     def contain(self, point):
-        if point.x > self.x and point.x <= self.x+self.w and point.y > self.y and point.y <= self.y+self.h:
+        if point[0] > self.x and point[0] <= self.x+self.w and point[1] > self.y and point[1] <= self.y+self.h:
             return True
         else: 
             return False
@@ -36,30 +36,36 @@ class QuadTreeNode:
         return math.sqrt((p1[0]-p2[0])**2 + (p1[1] - p2[1])**2)
 
     def divide(self):
-        self.subTree.append(QuadTreeNode(self.app, self.x, self.y, self.w/2, self.h/2))
-        self.subTree.append(QuadTreeNode(self.app, self.x+self.w/2, self.y, self.w/2, self.h/2))
-        self.subTree.append(QuadTreeNode(self.app, self.x, self.y+self.h/2, self.w/2, self.h/2))
-        self.subTree.append(QuadTreeNode(self.app, self.x+self.w/2, self.y+self.h/2, self.w/2, self.h/2))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y, self.w/2, self.h/2, self.lvl-1))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y, self.w/2, self.h/2, self.lvl-1))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1))
         self.divided = True
 
-    def insert(self, point, lvl):
+    def insert(self, point, data, lvl):
         
         if self.contain(point):
             if self.divided and self.lvl > lvl:
-                for i in self.subTree:
-                    i.insertPoint(point)
-            else:
-                if len(self.content) < self.capacity:
-                    self.content.append(point)
-                else:
-                    self.divide()
-                    for i in self.subTree:
-                        i.insertPoint(point)
+                for i in self.subNodes:
+                    i.insert(point, data, lvl)
+            elif(self.lvl == lvl):
+                self.content = data
+                self.subNodes = []
+                self.divided = False
+                self.updateParent()
+            elif(self.lvl == 0):
+                self.content = data
+                self.updateParent()
+            elif(not self.divided and self.lvl > lvl and self.lvl > 0):
+                self.divide()
+                self.content = None
+                for i in self.subNodes:
+                    i.insert(point, data, lvl)
 
     def findPoints(self, area, target = []):
         if self.intersect(area):
             if self.divided:
-                for i in self.subTree:
+                for i in self.subNodes:
                     i.findPoints(area, target)
             else:
                 for i in self.content:
@@ -67,15 +73,27 @@ class QuadTreeNode:
                         target.append(i)
         return target
 
+    def updateParent(self):
+        if(self.divided):
+            for i in self.subNodes:
+                if(i.content != self.subNodes[0].content):
+                    return
+            self.content = self.subNodes[0].content
+            self.divided = False
+            self.subNodes = []
+        if(self.parent != None):
+            self.parent.updateParent()
 
     def show(self):
         if self.divided:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
             pygame.draw.rect(self.app.screen, (255, 255, 255), rect, width=1)
-            for i in self.subTree:
+            for i in self.subNodes:
                 i.show()
         else:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
+            if(self.content != None):
+                pygame.draw.rect(self.app.screen, (255, 0, 0), rect)
             pygame.draw.rect(self.app.screen, (255, 255, 255), rect, width=1)
 
     def treeShow(self, x, y, w=800, layer = 0, sub = 0):
@@ -89,7 +107,7 @@ class QuadTreeNode:
             else:
                 x = x + (sub-2)*24
 
-            for index, i in enumerate(self.subTree):
+            for index, i in enumerate(self.subNodes):
                 i.treeShow(x, y, w, (layer+1), index)
             if layer != 0:
                 pygame.draw.line(self.app.screen, (255, 255, 255), (xOld, y+35*(layer-1)), (x, y+35*layer))

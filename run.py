@@ -1,7 +1,6 @@
 import pygame, sys, os, math, time, random
 from pygame.math import Vector2
 
-from item import Item
 from quadtreeBase import QuadTreeNode
 
 
@@ -37,9 +36,9 @@ class Game(object):
 
         self.points = []
  
-        self.qt = QuadTreeNode(self, 5, 5, 1000, 1000, 1)
+        self.qt = QuadTreeNode(self, None, 5, 5, 1000, 1000, 7)
 
-    
+        self.placementLvl = 0
         # self.objects.append(Node(self, Vector2(240, 400)))      #0
     
         while True:
@@ -52,13 +51,20 @@ class Game(object):
                     sys.exit(0)
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    pass
+                    self.placeDataPoint(pygame.mouse.get_pos(), 1, self.placementLvl)
                             
                 if event.type == pygame.MOUSEBUTTONUP:
                     pass
                 
                 if event.type == pygame.MOUSEMOTION:
                     pass
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.placementLvl += 1
+                    
+                    if event.key == pygame.K_DOWN:
+                        self.placementLvl -= 1
 
 
             #Ticking
@@ -71,6 +77,9 @@ class Game(object):
             self.draw()
             
             pygame.display.flip()
+
+    def placeDataPoint(self, point, data, lvl):
+        self.qt.insert(point, data, lvl)
 
     def tick(self):
         # self.qt = QuadTree2D(self, 0, 0, 1000, 1000, 1)
