@@ -3,7 +3,7 @@ from pygame.math import Vector2
 
 class QuadTreeNode:
 
-    def __init__(self, app, parent, x, y, w, h, lvl):
+    def __init__(self, app, parent, x, y, w, h, lvl, content = (0, 0, 0)):
 
         self.app = app
 
@@ -16,7 +16,7 @@ class QuadTreeNode:
 
         self.lvl = lvl
 
-        self.content = None
+        self.content = content
         self.divided = False
         
 
@@ -36,11 +36,19 @@ class QuadTreeNode:
         return math.sqrt((p1[0]-p2[0])**2 + (p1[1] - p2[1])**2)
 
     def divide(self):
-        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y, self.w/2, self.h/2, self.lvl-1))
-        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y, self.w/2, self.h/2, self.lvl-1))
-        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1))
-        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y, self.w/2, self.h/2, self.lvl-1, self.content))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y, self.w/2, self.h/2, self.lvl-1, self.content))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1, self.content))
+        self.subNodes.append(QuadTreeNode(self.app, self, self.x+self.w/2, self.y+self.h/2, self.w/2, self.h/2, self.lvl-1, self.content))
         self.divided = True
+
+    def countNodes(self):
+        count = 1
+        if self.divided:
+            for i in self.subNodes:
+                count += i.countNodes()
+
+        return count
 
     def insert(self, point, data, lvl):
         
@@ -87,14 +95,13 @@ class QuadTreeNode:
     def show(self):
         if self.divided:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
-            pygame.draw.rect(self.app.screen, (255, 255, 255), rect, width=1)
+            pygame.draw.rect(self.app.screen, (100, 100, 100), rect, width=1)
             for i in self.subNodes:
                 i.show()
         else:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
-            if(self.content != None):
-                pygame.draw.rect(self.app.screen, (255, 0, 0), rect)
-            pygame.draw.rect(self.app.screen, (255, 255, 255), rect, width=1)
+            pygame.draw.rect(self.app.screen, self.content, rect)
+            pygame.draw.rect(self.app.screen, (100, 100, 100), rect, width=1)
 
     def treeShow(self, x, y, w=800, layer = 0, sub = 0):
 
