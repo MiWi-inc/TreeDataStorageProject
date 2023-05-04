@@ -18,13 +18,6 @@ class QuadTreeNode:
 
         self.content = content
         self.divided = False
-        
-
-    def intersect(self, area):
-        if self.x > area[0]+area[2] or self.x+self.w < area[0] or self.y > area[1]+area[3] or self.y+self.h < area[1]:
-            return False
-        else:
-            return True
 
     def contain(self, point):
         if point[0] > self.x and point[0] <= self.x+self.w and point[1] > self.y and point[1] <= self.y+self.h:
@@ -32,8 +25,6 @@ class QuadTreeNode:
         else: 
             return False
     
-    def dist(self, p1, p2):
-        return math.sqrt((p1[0]-p2[0])**2 + (p1[1] - p2[1])**2)
 
     def divide(self):
         self.subNodes.append(QuadTreeNode(self.app, self, self.x, self.y, self.w/2, self.h/2, self.lvl-1, self.content))
@@ -69,17 +60,6 @@ class QuadTreeNode:
                 self.content = None
                 for i in self.subNodes:
                     i.insert(point, data, lvl)
-
-    def findPoints(self, area, target = []):
-        if self.intersect(area):
-            if self.divided:
-                for i in self.subNodes:
-                    i.findPoints(area, target)
-            else:
-                for i in self.content:
-                    if area.collidepoint(i.x, i.y):
-                        target.append(i)
-        return target
 
     def updateParent(self):
         if(self.divided):
