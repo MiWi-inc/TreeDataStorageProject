@@ -29,15 +29,11 @@ class Game(object):
         self.menuX = self.Xres - self.menuWidth
         self.baseColor = (126, 150, 189)
         self.inactiveColor = (40, 54, 77)
-        self.buttonPressed = True
-             
 
         #initialization
         self.screen = pygame.display.set_mode((self.Xres, self.Yres))
         self.tpsClock = pygame.time.Clock()
         self.tpsDelta = 0.0
-
-        self.points = []
 
         self.maxLvl = 7
  
@@ -78,15 +74,8 @@ class Game(object):
                 
                 if event.type == pygame.MOUSEMOTION:
                     pass
-                    #if pygame.mouse.get_pressed()[0]:
-                    #    self.placeDataPoint(pygame.mouse.get_pos(), 1, self.placementLvl)
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        self.placementLvl += 1
-                    
-                    if event.key == pygame.K_DOWN:
-                        self.placementLvl -= 1
+                    if pygame.mouse.get_pressed()[0]:
+                        self.placeDataPoint(pygame.mouse.get_pos(), self.color, self.placementLvl)
 
             if pygame.mouse.get_pressed() == (1, 0, 0):
                 if pygame.mouse.get_pos()[1] > self.barY+3-self.barSpacing/2 and pygame.mouse.get_pos()[1] < self.barY+28-self.barSpacing/2 and pygame.mouse.get_pos()[0] >= self.w-self.menuWidth+54 and pygame.mouse.get_pos()[0] <= self.w-self.menuWidth+54+self.barLen:
@@ -103,7 +92,6 @@ class Game(object):
             #Ticking
             self.tpsDelta += self.tpsClock.tick()/1000.0
             while self.tpsDelta > 1/self.tps:
-                self.tick()
                 self.tpsDelta -=1/self.tps
 
             
@@ -115,14 +103,6 @@ class Game(object):
         self.qt.insert(point, data, lvl)
         self.nodeCount = self.qt.countNodes()
 
-    def tick(self):
-        # self.qt = QuadTree2D(self, 0, 0, 1000, 1000, 1)
-        # for i in self.points:
-        #     self.qt.insertPoint(i)
-
-        # for i in self.points:
-        #     i.gravitate(self.qt)
-        pass
 
     def draw(self):
 
@@ -130,10 +110,7 @@ class Game(object):
         pygame.draw.rect(self.screen, (13, 13, 26), infoRect)
 
         self.qt.show()
-        # self.qt.treeShow(1000, 20)
-
-        for i in self.points:
-            pygame.draw.circle(self.screen, i.color, (i.x, i.y), 4)
+        #self.qt.treeShow(1000, 20)
         
         if self.debugMode:
             text = self.font.render("FPS: " + str(int(self.tpsClock.get_fps())) , True, (0, 255, 0))
