@@ -75,13 +75,13 @@ class QuadTreeNode:
     def show(self):
         if self.divided:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
-            pygame.draw.rect(self.app.screen, (100, 100, 100), rect, width=1)
+            pygame.draw.rect(self.app.screen, (50, 50, 50), rect, width=1)
             for i in self.subNodes:
                 i.show()
         else:
             rect = pygame.Rect(self.x, self.y, self.w, self.h)
             pygame.draw.rect(self.app.screen, self.content, rect)
-            pygame.draw.rect(self.app.screen, (100, 100, 100), rect, width=1)
+            pygame.draw.rect(self.app.screen, (50, 50, 50), rect, width=1)
 
     def treeShow(self, x, y, w=800, layer = 0, sub = 0):
 

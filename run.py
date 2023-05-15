@@ -2,6 +2,7 @@ import pygame, sys, os, math, time, random
 from pygame.math import Vector2
 
 from quadtreeBase import QuadTreeNode
+from imageProcessing import *
 
 
 class Game(object):
@@ -55,6 +56,12 @@ class Game(object):
         self.barSpacing=30
         self.radius = 0
         self.moved = False
+
+        image = loadImage()
+        interval = 1000/128
+        for i in range(128):
+            for j in range(128):
+                self.placeDataPoint((i*interval, j*interval), (image[j, i, 0], image[j, i, 1], image[j, i, 2]), 0)
     
         while True:
             self.screen.fill(bgColor)
