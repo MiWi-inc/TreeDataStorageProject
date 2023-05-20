@@ -64,12 +64,12 @@ class Game(object):
         self.moved = False
 
         imagePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content/image1.png')
-        imagePath2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content/sport2.png')
+        self.imagePath2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content/sport2.png')
         
 
         
-        self.image1 = loadImage(imagePath2)
-        self.image2 = quantizer(5, imagePath2,'preprocessing')
+        self.image1 = loadImage(self.imagePath2)
+        self.image2 = quantizer(5, self.imagePath2,'preprocessing')
         self.image = self.image1
 
         self.entropy = 0
@@ -100,7 +100,7 @@ class Game(object):
 
                     if self.updateButton.collidepoint(event.pos):
                         if self.quantizerClusters > 0:
-                            self.image = quantizer(self.quantizerClusters, imagePath2,'preprocessing')
+                            self.image = quantizer(self.quantizerClusters, self.imagePath2,'preprocessing')
                             self.update(self.image)
                             self.numberOfColors = getNumOfColors(self.image)
                             self.entropy = entropy(self.quantizerClusters, self.image)
@@ -187,7 +187,8 @@ class Game(object):
         self.screen.blit(text, (1030,130))
         text = self.font.render("Numer of colors in image: " + str(self.numberOfColors) , True, (0, 255, 0))
         self.screen.blit(text, (1030,160))
-        
+        text = self.font.render("PNG size: " + str(os.stat(self.imagePath2).st_size/1024) + " KiB" , True, (0, 255, 0))
+        self.screen.blit(text, (1030,190))
 
         pygame.draw.circle(self.screen, (self.R, self.G, self.B), (self.w-self.menuWidth/2, 40), (1000/(2**(self.maxLvl - self.placementLvl)))/2)
 
